@@ -1,4 +1,5 @@
 ﻿using Game1.Pieces;
+using Game1.Stage1;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,8 +15,11 @@ namespace Game1.Scene1 {
         public AppResources Rsc { get; }
 
         public Dealer Dealer { get; private set; }
-        public GameBoard<Card> Board { get; private set; }
         SelectionCollection selections = new SelectionCollection();
+
+        SpriteFont Font { get; set; }
+
+        private IPhase<SimpleChoicePhase.State> _phase;
 
         public TutorialStage(AppResources resources) {
             Rsc = resources;
@@ -23,7 +27,8 @@ namespace Game1.Scene1 {
 
         public void LoadContent() {
             Dealer = new Dealer(Rsc.Pipeline); //dealer generates cards
-            Board = new GameBoard<Card>(Rsc.GraphicsDevice);
+            Font = Rsc.Pipeline.Load<SpriteFont>("Fonts\\Font1");
+            _phase = new SimpleChoicePhase(Rsc.GraphicsDevice.Viewport, Dealer, Font);
         }
 
         public void UnloadContent() {
@@ -34,13 +39,17 @@ namespace Game1.Scene1 {
 
             UpdateMouseState();
 
-            //deal the game board
-            while (Board.Vacancies > 0) {
-                var newCard = Dealer.GetCard();
-                Board.PlaceCard(newCard);
-            }
+            //while (GameBoard.Vacancies > 0) {
+            //    var newCard = Dealer.GetCard();
+            //    GameBoard.PlaceCard(newCard);
+            //}
+            //GameBoard.Update(gameTime);
 
-            Board.Update(gameTime);
+            _phase.Update(gameTime);
+
+            if (_phase.MyState == SimpleChoicePhase.State.Done) {
+                Debugger.Break();
+            }
         }
 
         private void UpdateMouseState() {
@@ -52,9 +61,9 @@ namespace Game1.Scene1 {
 
             var currentState = currentMouseState.LeftButton;
             if (_lastState == ButtonState.Pressed && currentState == ButtonState.Released) {
-                var card = Board.CheckClicksOrNull(mousePosition);
-                if (card != null)
-                    OnClick(card);
+                //var card = Board.CheckClicksOrNull(mousePosition);
+                //if (card != null)
+                //    OnClick(card);
             }
             _lastState = currentState;
         }
@@ -93,7 +102,7 @@ namespace Game1.Scene1 {
         }
 
         public void Draw(GameTime gameTime) {
-            Board.DrawEm(Rsc.SpriteBatch, Rsc.DrawBatch);
+            _phase.DrawEm(Rsc.SpriteBatch, Rsc.DrawBatch);
         }
     }
 }

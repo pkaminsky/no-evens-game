@@ -44,10 +44,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AppResources.cs" />
+    <Compile Include="IUpdate.cs" />
     <Compile Include="Pieces\Dealer.cs" />
     <Compile Include="Pieces\GameBoard.cs" />
     <Compile Include="Pieces\SelectionCollection.cs" />
+    <Compile Include="Stage1\SimpleChoiceGameBoard.cs" />
+    <Compile Include="Stage1\SimpleChoicePhase.cs" />
     <Compile Include="Stage1\TutorialStage.cs" />
+    <Compile Include="Types\ClickedControlScheme.cs" />
     <Compile Include="Types\CycleAnimation.cs" />
     <Compile Include="Pieces\Card.cs" />
     <Compile Include="Game1.cs" />

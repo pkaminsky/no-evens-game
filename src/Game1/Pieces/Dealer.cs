@@ -10,7 +10,7 @@ using Game1.Types;
 using LilyPath;
 
 namespace Game1.Pieces {
-
+    
     public class Dealer : IDisposable {
 
         Size2D Size { get; set; }
@@ -48,6 +48,17 @@ namespace Game1.Pieces {
             return card;
         }
 
+        public Card GetCard(CardColor color, CardFill fill, CardShape shape) {
+            return GetCard(color.ToString(), fill.ToString(), shape.ToString());
+        }
+
+        /// <summary>Unsafe/lazy version. See also the enum-based version</summary>
+        public Card GetCard(string color, string fill, string shape) {
+            string key = $"{color}_{fill}_{shape}";
+            var texture = textures[key];
+            return new Card(texture, Size, key, this);
+        }
+
         public void Dispose() {
             foreach (var guy in textures.ToArray()) {
                 textures.Remove(guy.Key);
@@ -56,5 +67,17 @@ namespace Game1.Pieces {
                 HighlightPen?.Dispose();
             }
         }
+    }
+
+    public enum CardColor {
+        purple, red, green
+    }
+
+    public enum CardFill {
+        solid, striped, outline
+    }
+
+    public enum CardShape {
+        diamond, squig, oval
     }
 }

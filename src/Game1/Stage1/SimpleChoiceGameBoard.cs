@@ -1,4 +1,5 @@
-﻿using Game1.Types;
+﻿using Game1.Pieces;
+using Game1.Types;
 using LilyPath;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,18 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Game1.Pieces {
+namespace Game1.Stage1 {
+    public class SimpleChoiceGameBoard : IGameBoard<Card> {
 
-    public interface IGameBoard<C> where C : Card {
-        void Update(GameTime timeOfGame);
-        void DrawEm(SpriteBatch spriteBatch, DrawBatch drawBatch);
-        C CheckClicksOrNull(Vector2 clickLoc);
-        bool PlaceCard(C card);
-    }
-
-    public class GameBoard : IGameBoard<Card> {
-
-        int ydim = 4;
+        int ydim = 1;
         int xdim = 4;
 
         Size2D Sz { get; }
@@ -28,10 +21,12 @@ namespace Game1.Pieces {
         public int Vacancies => Capacity - PopulationCount;
 
         ICollection<Card> Cards { get; set; } = new List<Card>();
+        public bool Ready { get; private set; } = true;
+
         Card[,] chart;
 
-        public GameBoard(GraphicsDevice gd) {
-            Sz = new Size2D(gd.Viewport.Width, gd.Viewport.Height);
+        public SimpleChoiceGameBoard(Viewport gd) {
+            Sz = new Size2D(gd.Width, gd.Height);
             chart = new Card[ydim, xdim];
         }
 
@@ -43,11 +38,14 @@ namespace Game1.Pieces {
             }
             return null;
         }
-        
+
         public void Update(GameTime timeOfGame) {
             foreach (var c in Cards) {
                 c.Update(timeOfGame);
             }
+
+            //animate a card being placed, when done, do this
+            this.Ready = true;
         }
 
         /// <summary>Also sets the position in the card</summary>
@@ -59,6 +57,10 @@ namespace Game1.Pieces {
                 chart[t.Item1, t.Item2] = card;
                 Cards.Add(card);
                 SetCardScreenPosition(card, t.Item1, t.Item2);
+
+                //don't let new cards be placed
+                Ready = false;
+
                 return true;
             }
 
